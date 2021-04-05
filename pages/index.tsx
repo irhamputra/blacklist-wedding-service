@@ -163,7 +163,7 @@ const Home: NextPage<{
                   <th scope="col">Nama Organizer</th>
                   <th scope="col">Nama Pelaku</th>
                   <th scope="col">Kejahatan</th>
-                  <th scope="col">Alamat</th>
+                  <th scope="col">Alamat / Lokasi</th>
                   <th scope="col">HP</th>
                   <th scope="col">Sumber</th>
                 </tr>
