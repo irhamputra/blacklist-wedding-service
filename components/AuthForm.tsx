@@ -3,6 +3,7 @@ import * as React from "react";
 import useAuthMutation from "../hooks/useAuthMutation";
 import { useCookie } from "react-use";
 import { useRouter } from "next/router";
+import useBreakpoint from "../hooks/useBreakpoint";
 
 const AuthForm: React.FC<{
   type: "login" | "register" | undefined;
@@ -11,6 +12,7 @@ const AuthForm: React.FC<{
   const [id] = useCookie("id");
   const { reload } = useRouter();
   const { mutateAsync } = useAuthMutation(type);
+  const breakpoint = useBreakpoint();
 
   const { values, handleSubmit, handleChange } = useFormik({
     initialValues: {
@@ -41,7 +43,7 @@ const AuthForm: React.FC<{
       <form onSubmit={handleSubmit}>
         <div className="row">
           {type === "register" && (
-            <div className="col-6">
+            <div className={breakpoint === "tablet" ? "col-12" : "col-6"}>
               <label className="form-label">Full Name</label>
               <input
                 className="form-control"
@@ -55,7 +57,7 @@ const AuthForm: React.FC<{
             </div>
           )}
 
-          <div className="col-6">
+          <div className={breakpoint === "tablet" ? "col-12" : "col-6"}>
             <label className="form-label">Email</label>
             <input
               className="form-control"
@@ -69,7 +71,7 @@ const AuthForm: React.FC<{
             />
           </div>
 
-          <div className="col-6">
+          <div className={breakpoint === "tablet" ? "col-12" : "col-6"}>
             <label className="form-label">Password</label>
             <input
               className="form-control"
@@ -85,7 +87,7 @@ const AuthForm: React.FC<{
           </div>
 
           {type === "register" && (
-            <div className="col-6">
+            <div className={breakpoint === "tablet" ? "col-12" : "col-6"}>
               <label className="form-label">Confirm Password</label>
               <input
                 className="form-control"

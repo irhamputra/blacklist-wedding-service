@@ -17,6 +17,7 @@ import {
 import { parse } from "cookie";
 import axios from "axios";
 import { useCookie } from "react-use";
+import useBreakpoint from "../hooks/useBreakpoint";
 import useLogoutUser from "../hooks/useLogoutUser";
 
 const Home: NextPage<{
@@ -29,6 +30,7 @@ const Home: NextPage<{
   const { mutateAsync: createList } = useCreateDocs("Pelaku");
   const [id] = useCookie("id");
   const { mutateAsync: handleLogoutUser } = useLogoutUser();
+  const breakpoint = useBreakpoint();
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -45,6 +47,7 @@ const Home: NextPage<{
   return (
     <>
       <Dialog
+        style={{ width: breakpoint === "tablet" ? "100%" : "50vw" }}
         aria-label="dialog"
         isOpen={Boolean(showDialog)}
         onDismiss={() => setShowDialog(undefined)}
@@ -93,49 +96,67 @@ const Home: NextPage<{
           </div>
 
           <div className="col-12 mt-5">
-            <div className="align-items-center d-flex justify-content-center">
-              <h1 className="w-50">Blacklist Wedding Service</h1>
-              <h5>
-                List para pelaku penipu atau oknum yang merusak momen saat
-                pernikahan. <br /> Mari bantu untuk isi list direktori para
-                penipu
-              </h5>
+            <div className="row">
+              <div className="col-sm-12 col-md-6">
+                <h1>Blacklist Wedding Service</h1>
+              </div>
+
+              <div className="col-sm-12 col-md-6">
+                <h5>
+                  List para pelaku penipu atau oknum yang merusak momen saat
+                  pernikahan. <br /> Mari bantu untuk isi list direktori para
+                  penipu
+                </h5>
+              </div>
             </div>
           </div>
 
-          <div className="col-12 d-flex align-items-center justify-content-between">
-            <div className="input-group w-25 my-5">
-              <input
-                className="form-control"
-                placeholder="Cari Pelaku"
-                name="search"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  searchQuery(e.target.value);
-                }}
-              />
-            </div>
-            <div>
-              {user?.["email"] ? (
-                <>
-                  <small>Tidak menemukan listnya?</small>
+          <div className="col-12 my-5">
+            <div className="row">
+              <div className="col-sm-12 col-md-6">
+                <div
+                  className={`input-group ${
+                    breakpoint === "tablet" ? "w-100" : "w-50"
+                  }`}
+                >
+                  <input
+                    className="form-control"
+                    placeholder="Cari Pelaku"
+                    name="search"
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      searchQuery(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowDialog("addList")}
-                    className="btn btn-dark ms-3"
-                  >
-                    Tambahkan
-                  </button>
-                </>
-              ) : (
-                <small>Login terlebih dahulu untuk menambahkan list</small>
-              )}
+              <div
+                className={`col-sm-12 col-md-6 text-end ${
+                  breakpoint === "tablet" ? "mt-3" : ""
+                }`}
+              >
+                {user?.["email"] ? (
+                  <>
+                    <small>Tidak menemukan listnya?</small>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowDialog("addList")}
+                      className="btn btn-dark ms-3"
+                    >
+                      Tambahkan
+                    </button>
+                  </>
+                ) : (
+                  <small>Login terlebih dahulu untuk menambahkan list</small>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="col-12">
+          <div className="col-12 table-responsive mb-5">
             <table className="table table-striped table-hover">
               <thead>
                 <tr>
@@ -213,7 +234,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const BASE_URL =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://blacklist-wedding-service.com";
+      : "https://blacklist-wedding-service.vercel.app/";
 
   const { data } = await axios.get(`${BASE_URL}/api/v1/user`, {
     headers: {
