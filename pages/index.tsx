@@ -189,6 +189,14 @@ const Home: NextPage<{
           </div>
         </div>
       </div>
+
+      <footer className="footer text-center mt-auto py-2 bg-light fixed-bottom">
+        <div className="container-fluid d-flex justify-content-center">
+          <span className="text-muted small">
+            Built with ❤️ &nbsp; for happiness Indonesian 🇮🇩
+          </span>
+        </div>
+      </footer>
     </>
   );
 };
