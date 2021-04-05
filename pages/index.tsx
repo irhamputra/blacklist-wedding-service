@@ -121,7 +121,7 @@ const Home: NextPage<{
                 >
                   <input
                     className="form-control"
-                    placeholder="Cari Pelaku"
+                    placeholder="Cari Nama Pelaku, Alamat atau Nama WO"
                     name="search"
                     value={search}
                     onChange={(e) => {
