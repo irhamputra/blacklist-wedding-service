@@ -35,7 +35,7 @@ const Home: NextPage<{
   const searchQuery = (query: string) => {
     const options = {
       includeScore: true,
-      keys: ["namaPemilik", "namaService"],
+      keys: ["namaPemilik", "namaService", "alamat"],
     };
 
     const fuse = new Fuse(data, options);
