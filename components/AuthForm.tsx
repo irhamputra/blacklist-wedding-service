@@ -14,7 +14,7 @@ const AuthForm: React.FC<{
   const { mutateAsync } = useAuthMutation(type);
   const breakpoint = useBreakpoint();
 
-  const { values, handleSubmit, handleChange } = useFormik({
+  const { values, handleSubmit, handleChange, isSubmitting } = useFormik({
     initialValues: {
       email: "",
       password: "",
@@ -46,13 +46,14 @@ const AuthForm: React.FC<{
             <div className={breakpoint === "tablet" ? "col-12" : "col-6"}>
               <label className="form-label">Full Name</label>
               <input
+                disabled={isSubmitting}
                 className="form-control"
                 value={values.displayName}
                 onChange={handleChange}
                 name="displayName"
                 required
                 type="text"
-                placeholder="Nama anda"
+                placeholder="Nama Anda"
               />
             </div>
           )}
@@ -62,6 +63,7 @@ const AuthForm: React.FC<{
             <input
               className="form-control"
               value={values.email}
+              disabled={isSubmitting}
               onChange={handleChange}
               autoComplete="username"
               name="email"
@@ -76,13 +78,14 @@ const AuthForm: React.FC<{
             <input
               className="form-control"
               value={values.password}
+              disabled={isSubmitting}
               onChange={handleChange}
               name="password"
               autoComplete="current-password"
               minLength={8}
               required
               type="password"
-              placeholder="password anda"
+              placeholder="Password Anda"
             />
           </div>
 
@@ -94,6 +97,7 @@ const AuthForm: React.FC<{
                 value={values.confirmPassword}
                 onChange={handleChange}
                 name="confirmPassword"
+                disabled={isSubmitting}
                 minLength={8}
                 autoComplete="new-password"
                 required
@@ -104,8 +108,14 @@ const AuthForm: React.FC<{
           )}
         </div>
 
-        <button type="submit" className="btn btn-dark mt-3">
-          {type.replace(/(^\w|\s\w)/g, (s) => s.toUpperCase())}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="btn btn-dark mt-3"
+        >
+          {isSubmitting
+            ? "Mohon tunggu... "
+            : type.replace(/(^\w|\s\w)/g, (s) => s.toUpperCase())}
         </button>
       </form>
     </>
