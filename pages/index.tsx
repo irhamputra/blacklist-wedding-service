@@ -9,13 +9,26 @@ import AuthForm from "../components/AuthForm";
 import useGetAllDocs from "../hooks/useGetAllDocs";
 import useCreateDocs from "../hooks/useCreateDocs";
 import ListForm from "../components/ListForm";
+import {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
+import { parse } from "cookie";
+import axios from "axios";
+import { useCookie } from "react-use";
+import useLogoutUser from "../hooks/useLogoutUser";
 
-export default function Home() {
+const Home: NextPage<{
+  user: InferGetServerSidePropsType<any>;
+}> = ({ user }) => {
   const [search, setSearch] = React.useState("");
   const [filteredList, setFilteredList] = React.useState([]);
   const [showDialog, setShowDialog] = React.useState(undefined);
   const { data, isLoading } = useGetAllDocs("Pelaku");
   const { mutateAsync: createList } = useCreateDocs("Pelaku");
+  const [id] = useCookie("id");
+  const { mutateAsync: handleLogoutUser } = useLogoutUser();
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -37,7 +50,7 @@ export default function Home() {
         onDismiss={() => setShowDialog(undefined)}
       >
         {["login", "register"].includes(showDialog) ? (
-          <AuthForm type={showDialog} />
+          <AuthForm type={showDialog} onChange={setShowDialog} />
         ) : null}
 
         {showDialog === "addList" ? <ListForm /> : null}
@@ -46,19 +59,36 @@ export default function Home() {
       <div className="container">
         <div className="row">
           <div className="col-12">
-            <div className="d-flex justify-content-end mt-3">
-              <button
-                onClick={() => setShowDialog("login")}
-                className="btn btn-dark"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => setShowDialog("register")}
-                className="btn btn-outline-dark ms-3"
-              >
-                Register
-              </button>
+            <div className="d-flex justify-content-end mt-3 align-items-center">
+              {user?.["email"] ? (
+                <>
+                  <p className="m-0 me-3">Hello, {user["email"]}</p>
+                  <button
+                    className="btn btn-dark"
+                    type="button"
+                    onClick={async () => {
+                      await handleLogoutUser(id);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowDialog("login")}
+                    className="btn btn-dark"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => setShowDialog("register")}
+                    className="btn btn-outline-dark ms-3"
+                  >
+                    Register
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -87,14 +117,21 @@ export default function Home() {
               />
             </div>
             <div>
-              <small>Tidak menemukan listnya?</small>
-              <button
-                type="button"
-                onClick={() => setShowDialog("addList")}
-                className="btn btn-dark ms-3"
-              >
-                Tambah List
-              </button>
+              {user?.["email"] ? (
+                <>
+                  <small>Tidak menemukan listnya?</small>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowDialog("addList")}
+                    className="btn btn-dark ms-3"
+                  >
+                    Tambahkan
+                  </button>
+                </>
+              ) : (
+                <small>Login terlebih dahulu untuk menambahkan list</small>
+              )}
             </div>
           </div>
 
@@ -154,4 +191,33 @@ export default function Home() {
       </div>
     </>
   );
-}
+};
+
+export default Home;
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const cookie = parse(req.headers.cookie || "");
+
+  if (!cookie["id"]) return { props: {} };
+
+  const { id } = cookie;
+
+  const BASE_URL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://blacklist-wedding-services";
+
+  const { data } = await axios.get(`${BASE_URL}/api/v1/user`, {
+    headers: {
+      authorization: `Bearer ${id}`,
+    },
+  });
+
+  const [user] = data.users;
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
