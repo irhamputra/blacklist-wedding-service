@@ -7,7 +7,6 @@ import { Dialog } from "@reach/dialog";
 import AuthForm from "../components/AuthForm";
 
 import useGetAllDocs from "../hooks/useGetAllDocs";
-import useCreateDocs from "../hooks/useCreateDocs";
 import ListForm from "../components/ListForm";
 import {
   GetServerSideProps,
@@ -27,7 +26,6 @@ const Home: NextPage<{
   const [filteredList, setFilteredList] = React.useState([]);
   const [showDialog, setShowDialog] = React.useState(undefined);
   const { data, isLoading } = useGetAllDocs("Pelaku");
-  const { mutateAsync: createList } = useCreateDocs("Pelaku");
   const [id] = useCookie("id");
   const { mutateAsync: handleLogoutUser } = useLogoutUser();
   const breakpoint = useBreakpoint();
@@ -56,7 +54,9 @@ const Home: NextPage<{
           <AuthForm type={showDialog} onChange={setShowDialog} />
         ) : null}
 
-        {showDialog === "addList" ? <ListForm /> : null}
+        {showDialog === "addList" ? (
+          <ListForm email={user?.["email"] ?? ""} onAddList={setShowDialog} />
+        ) : null}
       </Dialog>
 
       <div className="container">
@@ -160,7 +160,7 @@ const Home: NextPage<{
             <table className="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Nama Service</th>
+                  <th scope="col">Nama Organizer</th>
                   <th scope="col">Nama Pelaku</th>
                   <th scope="col">Kejahatan</th>
                   <th scope="col">Alamat</th>

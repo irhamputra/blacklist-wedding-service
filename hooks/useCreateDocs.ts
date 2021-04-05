@@ -11,9 +11,7 @@ const useCreateDocs = <T>(name: string) => {
     },
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          `fetchCollection${name.toLowerCase()}`
-        );
+        await queryClient.invalidateQueries(`fetchCollection${name}`);
       },
     }
   );
